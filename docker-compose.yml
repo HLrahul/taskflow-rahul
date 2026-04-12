@@ -3,18 +3,18 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    restart: on-failure
     container_name: taskflow-api
+    restart: on-failure
     ports:
-      - "4000:4000"
+      - "${PORT:-4000}:4000"
     environment:
-      - PORT=4000
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=taskflow
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-taskflow}
       - DB_HOST=postgres
       - DB_PORT=5432
-      - JWT_SECRET=supersecret123
+      - JWT_SECRET=${JWT_SECRET:-supersecret123}
+      - PORT=4000
     depends_on:
       - postgres
 
@@ -26,9 +26,21 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-taskflow}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:4000}
+    container_name: taskflow-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
 
 volumes:
   postgres_data:

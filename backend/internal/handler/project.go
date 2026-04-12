@@ -1,19 +1,20 @@
 package handler
 
 import (
-	"strconv"
-	"net/http"
 	"encoding/json"
+	"log/slog"
+	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 
-	"taskflow-backend/internal/models"
 	"taskflow-backend/internal/middleware"
+	"taskflow-backend/internal/models"
 	"taskflow-backend/internal/repository"
 )
 
 type ProjectHandler struct {
-	repo *repository.ProjectRepository
+	repo     *repository.ProjectRepository
 	taskRepo *repository.TaskRepository
 }
 
@@ -34,7 +35,16 @@ func (h *ProjectHandler) ListProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{"projects": projects})
+	total, _ := h.repo.CountUserProjects(r.Context(), userID)
+
+	page := (offset / limit) + 1
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"projects": projects,
+		"total":    total,
+		"page":     page,
+		"limit":    limit,
+	})
 }
 
 // POST /projects
@@ -85,15 +95,16 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	limit, offset := parsePagination(r)
 	tasks, err := h.taskRepo.GetTasks(r.Context(), projectID, "", "", limit, offset)
 	if err != nil {
-		tasks = []models.Task{} 
+		slog.Error("GetTasks failed", "error", err, "projectID", projectID)
+		tasks = []models.Task{}
 	}
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id": project.ID,
-		"name": project.Name,
+		"id":          project.ID,
+		"name":        project.Name,
 		"description": project.Description,
-		"owner_id": project.OwnerID,
-		"tasks": tasks, 
+		"owner_id":    project.OwnerID,
+		"tasks":       tasks,
 	})
 }
 
@@ -159,7 +170,7 @@ func (h *ProjectHandler) GetProjectStats(w http.ResponseWriter, r *http.Request)
 }
 
 func parsePagination(r *http.Request) (int, int) {
-	limit := 5
+	limit := 10
 	page := 1
 
 	if l, err := strconv.Atoi(r.URL.Query().Get("limit")); err == nil && l > 0 && l <= 100 {

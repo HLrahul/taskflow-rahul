@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/cors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
@@ -38,6 +39,14 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -81,6 +90,16 @@ func main() {
 		r.Post("/projects/{id}/tasks", taskHandler.CreateTask)
 		r.Patch("/tasks/{id}", taskHandler.UpdateTask)
 		r.Delete("/tasks/{id}", taskHandler.DeleteTask)
+	})
+
+	// Team Routes
+	teamRepo := repository.NewTeamRepository(dbPool)
+	teamHandler := handler.NewTeamHandler(teamRepo, userRepo)
+
+	r.Group(func(r chi.Router) {
+		r.Use(taskflowMiddleware.RequireAuth)
+		r.Get("/team", teamHandler.GetTeam)
+		r.Post("/team", teamHandler.AddTeamMember)
 	})
 
 	srv := &http.Server{

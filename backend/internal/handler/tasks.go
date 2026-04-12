@@ -91,8 +91,8 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	taskID := chi.URLParam(r, "id")
 
-	isOwner, err := h.repo.CheckProjectOwnerByTask(r.Context(), taskID, userID)
-	if err != nil || !isOwner {
+	isOwner, isAssignee, err := h.repo.GetTaskAccessLevel(r.Context(), taskID, userID)
+	if err != nil || (!isOwner && !isAssignee) {
 		w.WriteHeader(http.StatusForbidden)
 		w.Write([]byte(`{"error": "Forbidden"}`))
 		return
@@ -105,7 +105,15 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	}
 	req.ID = taskID
 
-	task, err := h.repo.UpdateTask(r.Context(), &req)
+	var task *models.Task
+	if !isOwner && isAssignee {
+		// Strict lock: Assignees can only patch the status.
+		task, err = h.repo.UpdateTaskStatus(r.Context(), taskID, req.Status)
+	} else {
+		// Owner has full modification rights
+		task, err = h.repo.UpdateTask(r.Context(), &req)
+	}
+
 	if err != nil {
 		http.Error(w, `{"error": "Failed to update task"}`, http.StatusInternalServerError)
 		return
@@ -119,7 +127,7 @@ func (h *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	taskID := chi.URLParam(r, "id")
 
-	isOwner, err := h.repo.CheckProjectOwnerByTask(r.Context(), taskID, userID)
+	isOwner, _, err := h.repo.GetTaskAccessLevel(r.Context(), taskID, userID)
 	if err != nil || !isOwner {
 		w.WriteHeader(http.StatusForbidden)
 		w.Write([]byte(`{"error": "Forbidden"}`))
