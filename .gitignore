@@ -1,0 +1,12 @@
+.env
+
+backend/taskflow-api
+*.exe
+*.test
+go.work
+go.work.sum
+
+postgres_data/
+
+.DS_Store
+Thumbs.db
