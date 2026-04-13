@@ -1,10 +1,11 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# Copy lockfile and package.json
+COPY package.json bun.lock* ./
+RUN bun install
 
 COPY . .
 
@@ -12,7 +13,7 @@ COPY . .
 ARG VITE_API_URL=http://localhost:4000
 ENV VITE_API_URL=$VITE_API_URL
 
-RUN npm run build
+RUN bun run build
 
 # Production stage
 FROM nginx:stable-alpine

@@ -6,16 +6,17 @@ A modern, collaborative Kanban-style task management application where users can
 
 ## Tech Stack
 
-| Layer          | Technology                                  |
-| -------------- | ------------------------------------------- |
-| **Backend**    | Go 1.22+, Chi Router, pgx (Postgres Driver) |
-| **Frontend**   | React 19, Vite, Tailwind CSS v4, Shadcn/UI  |
-| **State Mgt.** | TanStack Query (React Query)                |
-| **Database**   | PostgreSQL 15                               |
-| **Migrations** | golang-migrate                              |
-| **Auth**       | JWT (golang-jwt) + bcrypt                   |
-| **Logging**    | slog (structured JSON)                      |
-| **Deployment** | Docker, Docker Compose (Multi-stage builds) |
+| Layer            | Technology                                  |
+| ---------------- | ------------------------------------------- |
+| **Backend**      | Go 1.22+, Chi Router, pgx (Postgres Driver) |
+| **Frontend**     | React 19, Vite, Tailwind CSS v4, Shadcn/UI  |
+| **Runtime (FE)** | Bun 1.3+                                    |
+| **State Mgt.**   | TanStack Query (React Query)                |
+| **Database**     | PostgreSQL 15                               |
+| **Migrations**   | golang-migrate                              |
+| **Auth**         | JWT (golang-jwt) + bcrypt                   |
+| **Logging**      | slog (structured JSON)                      |
+| **Deployment**   | Docker, Docker Compose (Bun multi-stage)    |
 
 ---
 
