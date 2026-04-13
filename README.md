@@ -83,7 +83,7 @@ frontend/
 Assumes Docker and Docker Compose are installed. No Go or Node.js installation required.
 
 ```bash
-git clone https://github.com/your-username/taskflow-rahul.git
+git clone https://github.com/HLrahul/taskflow-rahul.git
 cd taskflow-rahul
 cp .env.example .env
 docker compose up --build -d
