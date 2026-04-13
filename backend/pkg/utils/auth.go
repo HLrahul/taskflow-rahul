@@ -4,13 +4,18 @@ import (
 	"os"
 	"time"
 	"errors"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	cost := 12
+	if c, err := strconv.Atoi(os.Getenv("BCRYPT_COST")); err == nil && c >= 4 && c <= 31 {
+		cost = c
+	}
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 
 	return string(bytes), err
 }

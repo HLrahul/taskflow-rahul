@@ -24,16 +24,16 @@ func InitDB() *pgxpool.Pool {
 
 	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		slog.Error("Unable to connect to database", "error", err)
+		slog.Error("unable to connect to database", "error", err)
 		os.Exit(1)
 	}
 
 	if err := pool.Ping(context.Background()); err != nil {
-		slog.Error("Cannot ping database", "error", err)
+		slog.Error("cannot ping database", "error", err)
 		os.Exit(1)
 	}
 
-	slog.Info("Successfully connected to Postgres!")
+	slog.Info("successfully connected to postgres!")
 	runMigrations(connStr)
 
 	return pool
@@ -42,14 +42,14 @@ func InitDB() *pgxpool.Pool {
 func runMigrations(connStr string) {
 	m, err := migrate.New("file://migrations", connStr)
 	if err != nil {
-		slog.Error("Could not create migrate instance", "error", err)
+		slog.Error("could not create migrate instance", "error", err)
 		os.Exit(1)
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		slog.Error("Could not run up migrations", "error", err)
+		slog.Error("could not run up migrations", "error", err)
 		os.Exit(1)
 	}
 
-	slog.Info("Database migrations ran successfully (or no new changes)")
+	slog.Info("database migrations ran successfully (or no new changes)")
 }

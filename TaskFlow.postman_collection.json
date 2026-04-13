@@ -149,7 +149,49 @@
           }
         },
         {
-          "name": "Get Project Stats (Bonus)",
+          "name": "Update Project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/projects/PASTE_PROJECT_ID_HERE",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "PASTE_PROJECT_ID_HERE"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Project Name\",\n  \"description\": \"Updated description text\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/projects/PASTE_PROJECT_ID_HERE",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "PASTE_PROJECT_ID_HERE"]
+            }
+          }
+        },
+        {
+          "name": "Get Project Stats",
           "request": {
             "method": "GET",
             "header": [
@@ -196,7 +238,7 @@
           }
         },
         {
-          "name": "List Tasks (Filtered & Paginated)",
+          "name": "List Project Tasks",
           "request": {
             "method": "GET",
             "header": [
@@ -223,6 +265,95 @@
                   "value": "1"
                 }
               ]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tasks/PASTE_TASK_ID_HERE",
+              "host": ["{{base_url}}"],
+              "path": ["tasks", "PASTE_TASK_ID_HERE"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"done\",\n  \"priority\": \"medium\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tasks/PASTE_TASK_ID_HERE",
+              "host": ["{{base_url}}"],
+              "path": ["tasks", "PASTE_TASK_ID_HERE"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Team",
+      "item": [
+        {
+          "name": "List Team Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/team",
+              "host": ["{{base_url}}"],
+              "path": ["team"]
+            }
+          }
+        },
+        {
+          "name": "Add Team Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/team",
+              "host": ["{{base_url}}"],
+              "path": ["team"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"collaborator@example.com\"\n}"
             }
           }
         }

@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"os"
 	"context"
-	"strings"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -19,13 +19,13 @@ func RequireAuth(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+			http.Error(w, `{"error": "unauthorized"}`, http.StatusUnauthorized)
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+			http.Error(w, `{"error": "unauthorized"}`, http.StatusUnauthorized)
 			return
 		}
 
@@ -41,7 +41,7 @@ func RequireAuth(next http.Handler) http.Handler {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+			http.Error(w, `{"error": "unauthorized"}`, http.StatusUnauthorized)
 			return
 		}
 

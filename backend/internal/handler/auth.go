@@ -28,7 +28,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	var req models.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "Invalid json payload"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid json payload"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
-		http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "internal server error"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -81,20 +81,20 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	var req models.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "Invalid json payload"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid json payload"}`, http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.repo.GetUserByEmail(r.Context(), req.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`{"error": "No user with this email"}`))
+		w.Write([]byte(`{"error": "no user with this email"}`))
 		return
 	}
 
 	if !utils.CheckPasswordHash(req.Password, user.Password) {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`{"error": "Incorrect password"}`))
+		w.Write([]byte(`{"error": "incorrect password"}`))
 		return
 	}
 

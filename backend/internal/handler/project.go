@@ -59,7 +59,7 @@ func (h *ProjectHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "Invalid json payload"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid json payload"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	limit, offset := parsePagination(r)
 	tasks, err := h.taskRepo.GetTasks(r.Context(), projectID, "", "", limit, offset)
 	if err != nil {
-		slog.Error("GetTasks failed", "error", err, "projectID", projectID)
+		slog.Error("getTasks failed", "error", err, "projectID", projectID)
 		tasks = []models.Task{}
 	}
 

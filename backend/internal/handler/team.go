@@ -23,7 +23,7 @@ func (h *TeamHandler) GetTeam(w http.ResponseWriter, r *http.Request) {
 
 	members, err := h.teamRepo.GetTeamMembers(r.Context(), userID)
 	if err != nil {
-		http.Error(w, `{"error": "Failed to fetch team"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "failed to fetch team"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -38,29 +38,29 @@ func (h *TeamHandler) AddTeamMember(w http.ResponseWriter, r *http.Request) {
 		Email string `json:"email"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "Invalid json payload"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid json payload"}`, http.StatusBadRequest)
 		return
 	}
 
 	userToAdd, err := h.userRepo.GetUserByEmail(r.Context(), req.Email)
 	if err != nil || userToAdd == nil {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "User with this email not found"}`))
+		w.Write([]byte(`{"error": "user with this email not found"}`))
 		return
 	}
 
 	if userToAdd.ID == userID {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "You cannot add yourself to your team"}`))
+		w.Write([]byte(`{"error": "you cannot add yourself to your team"}`))
 		return
 	}
 
 	err = h.teamRepo.AddTeamMember(r.Context(), userID, userToAdd.ID)
 	if err != nil {
-		http.Error(w, `{"error": "Failed to add team member"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "failed to add team member"}`, http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{"message": "Team member added successfully!", "member": userToAdd})
+	json.NewEncoder(w).Encode(map[string]interface{}{"message": "team member added successfully!", "member": userToAdd})
 }

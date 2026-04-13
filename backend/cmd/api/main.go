@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-chi/cors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 
 	"taskflow-backend/internal/database"
@@ -27,7 +27,7 @@ func main() {
 
 	err := godotenv.Load("../.env")
 	if err != nil {
-		slog.Warn("No .env file found or couldn't load it. Relying on system environment variables.")
+		slog.Warn("no .env file found or couldn't load it. Relying on system environment variables.")
 	}
 
 	dbPool := database.InitDB()
@@ -110,24 +110,24 @@ func main() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
-	go func () {
-		slog.Info("Starting API server", "port", port)
+	go func() {
+		slog.Info("starting API server", "port", port)
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("Server failed to start", "error", err)
+			slog.Error("server failed to start", "error", err)
 			os.Exit(1)
 		}
 	}()
 
 	<-stop
-	slog.Info("Received SIGTERM/SIGINT. Shutting down gracefully...")
+	slog.Info("received SIGTERM/SIGINT. Shutting down gracefully...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		slog.Error("Server forced to shutdown", "error", err)
+		slog.Error("server forced to shutdown", "error", err)
 	}
 
-	slog.Info("Server successfully stopped.")
+	slog.Info("server successfully stopped.")
 }

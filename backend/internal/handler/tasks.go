@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
-	"taskflow-backend/internal/models"
 	"taskflow-backend/internal/middleware"
+	"taskflow-backend/internal/models"
 	"taskflow-backend/internal/repository"
 )
 
@@ -32,7 +32,7 @@ func (h *TaskHandler) ListTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := h.repo.GetTasks(r.Context(), projectID, status, assigneeID, limit, offset)
 	if err != nil {
-		http.Error(w, `{"error": "Failed to list tasks"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "failed to list tasks"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -49,19 +49,19 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	_, err := h.projectRepo.GetProjectByID(r.Context(), projectID, userID)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte(`{"error": "Forbidden"}`))
+		w.Write([]byte(`{"error": "forbidden"}`))
 		return
 	}
 
 	var req models.Task
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "Invalid json payload"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid json payload"}`, http.StatusBadRequest)
 		return
 	}
 
 	if req.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "Validation failed", "fields": {"title": "is required"}}`))
+		w.Write([]byte(`{"error": "validation failed", "fields": {"title": "is required"}}`))
 		return
 	}
 
@@ -76,7 +76,7 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	task, err := h.repo.CreateTask(r.Context(), &req)
 	if err != nil {
-		http.Error(w, `{"error": "Failed to create task"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "failed to create task"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	var req models.Task
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "Invalid json payload"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid json payload"}`, http.StatusBadRequest)
 		return
 	}
 	req.ID = taskID
@@ -115,7 +115,7 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, `{"error": "Failed to update task"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "failed to update task"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (h *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	err = h.repo.DeleteTask(r.Context(), taskID)
 	if err != nil {
-		http.Error(w, `{"error": "Failed to delete"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "failed to delete"}`, http.StatusInternalServerError)
 		return
 	}
 
