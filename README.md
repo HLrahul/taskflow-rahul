@@ -19,19 +19,55 @@ A modern, collaborative Kanban-style task management application where users can
 
 ---
 
+## Project Structure
+
+### Backend Architecture
+```text
+backend/
+├── cmd/api/main.go          # Entry point — server bootstrap & graceful shutdown
+├── internal/
+│   ├── database/            # Connection pooling & migration runner
+│   ├── handler/             # HTTP handlers (REST logic & validation)
+│   ├── middleware/          # JWT authentication middleware
+│   ├── models/              # Request/Response & Database structs
+│   └── repository/          # Data access layer (Postgres queries)
+├── migrations/              # SQL migration files (up + down)
+├── pkg/utils/               # Constants & Auth utilities (JWT/Bcrypt)
+└── Dockerfile               # Multi-stage Go build
+```
+
+### Frontend Architecture
+```text
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── layout/          # Navigation & shared wrappers
+│   │   ├── ui/              # Atomized Shadcn/UI components
+│   │   └── ...              # Domain components (TaskCard, TeamManager)
+│   ├── context/             # Auth & Global state management
+│   ├── lib/                 # API client (Axios) & Tailwind utilities
+│   ├── pages/               # Routed view components (Dashboard, Login, etc.)
+│   ├── App.tsx              # Root routing mapping
+│   └── main.tsx             # React mount point
+├── public/                  # Favicons & static assets
+├── index.html               # SPA entry point
+└── Dockerfile               # Multi-stage Node/Nginx build
+```
+
+---
+
 ## Architecture Decisions
 
-### Project Structure (Backend & Frontend approach)
-
-- **Backend Structure**: A clean layered architecture using `cmd` (entry point), `internal/handler`, `internal/repository`, `internal/models`, and `internal/middleware`. `internal` prevents external imports, keeping the module encapsulated.
-- **Frontend Structure**: Component-driven design utilizing `pages`, `components` (Shadcn/UI & layouts), `context` (Auth state), and `lib` (axios/utils).
-- **Multi-Player Core**: Introduced a `team_members` relationship which allows project owners to collaborate with other registered users securely.
-- **High-Performance Data Retrieval**: To avoid the "N+1 query" problem, the backend uses **Common Table Expressions (CTEs)** and **LEFT JOINs** to fetch tasks along with their assignee metadata (Name, Email) in a single database round-trip.
-- **Hybrid UI Updates**:
-  - **Optimistic UI**: Drag-and-drop operations immediately reflect on the board for a zero-latency feel, with automatic state rollback on server failures (handled via TanStack Query).
-  - **Pessimistic UI**: Critical operations like creating projects or deleting tasks use standard loading states to ensure data integrity.
+### Collaborative Core
+- **Multi-Player Support**: Introduced a `team_members` relationship which allows project owners to collaborate with other registered users securely.
+- **High-Performance Joins**: To avoid the "N+1 query" problem, the backend uses **Common Table Expressions (CTEs)** and **LEFT JOINs** to fetch tasks along with their assignee metadata in a single database round-trip.
 - **Role-Based Access Control (RBAC)**: Strict backend ownership checks. Project owners have full control; task assignees can only update statuses; team members gain view-only access.
 - **No ORM**: Using `database/sql` patterns (via `pgxpool`) directly with parameterized queries avoids ORM overhead, prevents hidden N+1 issues, and keeps SQL explicit and readable.
+
+### UI/UX Implementation
+- **Hybrid State Updates**:
+  - **Optimistic UI**: Drag-and-drop operations immediately reflect on the board for a zero-latency feel, with automatic state rollback on server failures (via TanStack Query).
+  - **Pessimistic UI**: Critical operations like creating projects or deleting tasks use standard loading states to ensure data integrity.
 
 ### Tradeoffs
 
@@ -81,7 +117,7 @@ docker compose up --build -d
 
 ## Running Migrations
 
-Migrations run **automatically on container startup**. No manual steps required.
+Migrations run **automatically on container startup**. No manual steps required. 
 
 The Go backend spins up, ping checks the database, and calls `golang-migrate` to execute pending migrations and seeds before the HTTP server ever begins listening.
 
@@ -252,7 +288,7 @@ All errors follow a standardized format to simplify frontend handling:
 
 ### Things I'd add next
 
-- **End-to-End (E2E) Testing:** Implement Playwright or Cypress tests to automate interactions like drag-and-drop on the Kanban board and ensure UX flows are rock-solid.
+- **Testing:** Implement testing for both frontend and backend.
 - **WebSockets / Server-Sent Events:** Replace optimistic UI / periodic fetching with fully real-time backend updates so multiple team members editing the same project see changes instantaneously.
 - **Request Validation Library:** Right now, validation is relatively manual mapped in the handlers. Adopting a library like `go-playground/validator` would reduce boilerplate for more complex schemas.
 - **Activity Feed / Audit Logs:** Record changes like "User X moved Task Y to Done" or "User Z updated Description" to provide a full paper trail for teams tracking history.
